@@ -34,18 +34,22 @@ fullPathfileName = args(0)
 fullPathLength   = Len(fullPathfileName)
 
 fileNamePos = InStrRev(fullPathfileName, "\")
-extNamePos  = InStrRev(fullPathfileName, ".")
+extNamePos  = InStr(fileNamePos, fullPathfileName, ".")
 
-' 拡張子切り出し
-extName = Right(fullPathfileName, fullPathLength - extNamePos)
+If extNamePos > 0 Then
+    ' 拡張子切り出し
+    extName = Right(fullPathfileName, fullPathLength - extNamePos + 1)
+Else
+    extName = ""
+End If
 
 ' フォルダ名切り出し
 folderName = Left(fullPathfileName, fileNamePos - 1)
 
 ' ファイル名切り出し
-fileName = Mid(fullPathfileName, fileNamePos + 1, fullPathLength - (Len(folderName) + Len(extName) + 2))
+fileName = Mid(fullPathfileName, fileNamePos + 1, fullPathLength - (Len(folderName) + Len(extName) + 1))
 
-message = fileName & "." & extName & "をいくつコピーしますか？"
+message = fileName & extName & "をいくつコピーしますか？"
 inputNum = InputBox(message, title)
 
 If Len(inputNum) = 0 Then ' キャンセルが押された場合
@@ -57,7 +61,7 @@ ElseIf IsNumeric(inputNum) Then ' OKが押されて、数値が入力された場合
     scriptPath = Left(scriptPath_tmp, Len(scriptPath_tmp) - 1 )
 
     For loopCntFileNum = 1 TO inputNum
-        fileNameCopyTo  = scriptPath & "\" & fileName & "_" & loopCntFileNum & "." & extName
+        fileNameCopyTo  = scriptPath & "\" & fileName & "_" & loopCntFileNum & extName
         Call fileSystemObject.CopyFile(fileNameCopyFrom,fileNameCopyTo,False) ' コピー実施
     Next
 
